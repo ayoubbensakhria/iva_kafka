@@ -1,0 +1,76 @@
+components:
+- name: streammux
+  parameters:
+    async-process: 'True'
+    attach-sys-ts: 'True'
+    batch-size: 1
+    batched-push-timeout: '40000'
+    buffer-pool-size: '4'
+    compute-hw: '0'
+    enable-padding: 'False'
+    frame-duration: '-140462611'
+    frame-num-reset-on-eos: 'False'
+    frame-num-reset-on-stream-reset: 'False'
+    gpu-id: '0'
+    height: 1080
+    interpolation-method: '1'
+    live-source: 'False'
+    max-latency: '0'
+    num-surfaces-per-frame: '1'
+    nvbuf-memory-type: '0'
+    sync-inputs: 'False'
+    width: 1920
+name: streammux
+---
+components:
+- name: Audio Inference8
+  parameters:
+    audio-framesize: 441000
+    audio-hopsize: 110250
+    audio-transform: melsdb,fft_length=2560,hop_size=692,dsp_window=hann,num_mels=128,sample_rate=44100,p2db_ref=(float)1.0,p2db_min_power=(float)0.0,p2db_top_db=(float)80.0
+    batch-size: 2
+    classifier-type: ''
+    config-file-path: ''
+    gpu-id: '0'
+    model-engine-file: ''
+    output-tensor-meta: 'False'
+    raw-output-file-write: 'False'
+    unique-id: '15'
+- name: SONYC Audio Classifier12
+  parameters:
+    classifier-threshold: '0.0'
+    enable-dla: 'False'
+    infer-dims: N/A
+    model-engine-file: sonyc_audio_classify.onnx_b2_gpu0_fp32.enginesonyc_audio_classify.onnx_b2_gpu0_fp32.engine
+    network-mode: '0'
+    tensor-meta-pool-size: '6'
+    use-dla-core: '0'
+name: Audio Inference
+---
+components:
+- name: Multi Source Input10
+  parameters:
+    cudadec-memtype: '0'
+    dec-skip-frames: N/A
+    drop-frame-interval: N/A
+    file-loop: true
+    gpu-id: N/A
+    latency: N/A
+    num-extra-surfaces: N/A
+    peer-pad-id-same-as-source-id: 'False'
+    rtsp-reconnect-interval: N/A
+    select-rtp-protocol: N/A
+    smart-rec-cache: '0'
+    smart-rec-container: N/A
+    smart-rec-default-duration: N/A
+    smart-rec-dir-path: N/A
+    smart-rec-file-prefix: N/A
+    smart-rec-mode: N/A
+    smart-rec-status: N/A
+    smart-rec-video-cache: N/A
+    smart-record: N/A
+    source-id-list: N/A
+    type: N/A
+    udp-buffer-size: '524288'
+    uri-list: file:///opt/nvidia/deepstream/deepstream/samples/streams/sample_1080p_h264.mp4
+name: Multi Source Input

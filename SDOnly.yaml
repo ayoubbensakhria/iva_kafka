@@ -1,0 +1,175 @@
+application:
+  name: deepstream-test2
+---
+dependencies:
+- extension: NvDsInferenceExt
+  uuid: 0b02963e-c24e-4c13-ace0-c4cdf36c7c71
+  version: 1.1.0
+- extension: NvDsBaseExt
+  uuid: 56d7e3ec-62c6-4652-bcc8-4f1c3b00df03
+  version: 1.2.0
+- extension: NvDsSampleModelsExt
+  uuid: 909dc1ea-c654-44c1-97a3-0b8fec12141a
+  version: 1.1.0
+- extension: NvDsOutputSinkExt
+  uuid: 3fc9ad87-03e7-47a8-bbfc-8501c3f7ff2f
+  version: 1.1.0
+- extension: NvDsInferenceUtilsExt
+  uuid: 27856a43-5ad4-4d8e-be36-0ec2cf9bbb58
+  version: 1.1.1
+- extension: NvDsSourceExt
+  uuid: a632d022-3425-4848-9074-e6483ef74366
+  version: 1.1.1
+- extension: NvDsMuxDemuxExt
+  uuid: 89b8398c-5820-4051-835c-a91f2d49766b
+  version: 1.1.0
+---
+components:
+- name: Audio Inference8
+  parameters:
+    audio-framesize: 441000
+    audio-hopsize: 110250
+    audio-in: Static Data Input10
+    audio-out: Static Data Output9
+    audio-transform: melsdb,fft_length=2560,hop_size=692,dsp_window=hann,num_mels=128,sample_rate=44100,p2db_ref=(float)1.0,p2db_min_power=(float)0.0,p2db_top_db=(float)80.0
+    batch-size: 2
+    infer-model-config: SONYC Audio Classifier12
+  type: nvidia::deepstream::NvDsInferAudio
+- name: Static Data Output9
+  type: nvidia::deepstream::NvDsStaticOutput
+- name: Static Data Input10
+  type: nvidia::deepstream::NvDsStaticInput
+- name: SONYC Audio Classifier12
+  parameters:
+    model-engine-file: sonyc_audio_classify.onnx_b2_gpu0_fp32.enginesonyc_audio_classify.onnx_b2_gpu0_fp32.engine
+  type: nvidia::deepstream::NvDsSonyCAudioClassifierModel
+name: Audio Inference
+ui_property:
+  position:
+    x: 611.4039306640625
+    y: -212.75137329101562
+---
+components:
+- name: Fake Sink13
+  parameters:
+    in: Static Data Input14
+  type: nvidia::deepstream::NvDsFakeSink
+- name: Static Data Input14
+  type: nvidia::deepstream::NvDsStaticInput
+name: Fake Sink
+ui_property:
+  position:
+    x: 883.89501953125
+    y: -255.2847442626953
+---
+components:
+- name: Deepstream Data Connection15
+  parameters:
+    source: Audio Inference/Static Data Output9
+    target: Fake Sink/Static Data Input14
+  type: nvidia::deepstream::NvDsConnection
+name: node3
+---
+components:
+- name: Audio Classification Output16
+  parameters:
+    probe-connector: Probe Connector17
+  type: nvidia::deepstream::NvDsAudioClassificationPrint
+- name: Probe Connector17
+  type: nvidia::deepstream::NvDsProbeConnector
+name: Audio Classification Output
+ui_property:
+  position:
+    x: 944.5968627929688
+    y: -123.93318176269531
+---
+components:
+- name: Probe Monitor18
+  parameters:
+    io: Audio Inference/Static Data Output9
+    probe-connector: Audio Classification Output/Probe Connector17
+  type: nvidia::deepstream::NvDsProbe
+name: node4
+---
+components:
+- name: Multi Source Input10
+  parameters:
+    audio-%u-out: Multiple Data Output12
+    file-loop: true
+    uri-list: file:///home/msc1/Desktop/Graphs/sample.mp4
+    video-%u-out: Multiple Data Output11
+  type: nvidia::deepstream::NvDsMultiSrcInput
+- name: Multiple Data Output11
+  type: nvidia::deepstream::NvDsMultiOutput
+- name: Multiple Data Output12
+  type: nvidia::deepstream::NvDsMultiOutput
+name: Multi Source Input
+ui_property:
+  position:
+    x: -194.86753845214844
+    y: -182.6275634765625
+---
+components:
+- name: Deepstream Queue14
+  parameters:
+    in: Static Data Input16
+    out: Static Data Output15
+  type: nvidia::deepstream::NvDsQueue
+- name: Static Data Output15
+  type: nvidia::deepstream::NvDsStaticOutput
+- name: Static Data Input16
+  type: nvidia::deepstream::NvDsStaticInput
+name: Deepstream Queue
+ui_property:
+  position:
+    x: 356.00140380859375
+    y: -220.29518127441406
+---
+components:
+- name: Deepstream Data Connection24
+  parameters:
+    source: Deepstream Queue/Static Data Output15
+    target: Audio Inference/Static Data Input10
+  type: nvidia::deepstream::NvDsConnection
+name: node6
+---
+components:
+- name: Deepstream Scheduler10
+  type: nvidia::deepstream::NvDsScheduler
+name: scheduler
+ui_property:
+  position:
+    x: -2293.6669921875
+    y: 0.0
+---
+components:
+- name: New Stream Muxer11
+  parameters:
+    in-%u: On Request Data Input12
+    out: Static Data Output13
+  type: nvidia::deepstream::NvDsStreamMuxNew
+- name: On Request Data Input12
+  type: nvidia::deepstream::NvDsOnRequestInput
+- name: Static Data Output13
+  type: nvidia::deepstream::NvDsStaticOutput
+name: New Stream Muxer
+ui_property:
+  position:
+    x: 100.66046142578125
+    y: -172.01022338867188
+---
+components:
+- name: Multi Data Connection14
+  parameters:
+    source: Multi Source Input/Multiple Data Output11
+    target: New Stream Muxer/On Request Data Input12
+  type: nvidia::deepstream::NvDsMultiSrcConnection
+name: node5
+---
+components:
+- name: Deepstream Data Connection15
+  parameters:
+    source: New Stream Muxer/Static Data Output13
+    target: Deepstream Queue/Static Data Input16
+  type: nvidia::deepstream::NvDsConnection
+name: node6
