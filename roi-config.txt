@@ -1,0 +1,9 @@
+[property]
+roi-poly-config=100,100,200,100,200,200,100,200
+count-line-config=150,100,150,200
+generate-unique-id=1
+filter-out-small-objects=1
+min-width=50
+min-height=50
+max-objects=10
+display-stats=1

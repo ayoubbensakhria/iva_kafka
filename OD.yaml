@@ -29,6 +29,9 @@ dependencies:
 - extension: NvDsMuxDemuxExt
   uuid: 89b8398c-5820-4051-835c-a91f2d49766b
   version: 1.1.0
+- extension: NvDsAnalyticsExt
+  uuid: 0aee1c83-fad2-4bba-a25a-b253a8289f13
+  version: 1.1.0
 ---
 components:
 - name: object_detector
@@ -68,8 +71,8 @@ components:
 name: tracker
 ui_property:
   position:
-    x: 625.668701171875
-    y: 38.27986145019531
+    x: 623.6847534179688
+    y: -33.142799377441406
   state: 0
 ---
 components:
@@ -92,14 +95,6 @@ ui_property:
     x: 853.0664672851562
     y: 30.793474197387695
   state: 0
----
-components:
-- name: nv_ds_connection22..8470
-  parameters:
-    source: tracker/video_output
-    target: car_color_classifier/video_input
-  type: nvidia::deepstream::NvDsConnection
-name: node..bac8
 ---
 components:
 - name: car_make_classifier
@@ -162,8 +157,18 @@ name: node..aeb8
 components:
 - name: onscreen_display
   parameters:
+    border-width: 5
+    clock-color: 0
+    clock-font-size: 18
+    display-clock: true
+    display-mask: true
+    text-bg-color: 0
+    text-color: 0
+    text-size: 15
     video-in: video_input
     video-out: video_output
+    x-clock-offset: 20
+    y-clock-offset: 60
   type: nvidia::deepstream::NvDsOSD
 - name: video_input
   type: nvidia::deepstream::NvDsStaticInput
@@ -172,8 +177,8 @@ components:
 name: onscreen_display
 ui_property:
   position:
-    x: 241.4962158203125
-    y: 318.8583679199219
+    x: 308.83380126953125
+    y: 289.36285400390625
   state: 0
 ---
 components:
@@ -220,7 +225,8 @@ components:
 - name: nv_ds_rtsp_out0
   parameters:
     audio-in: On Request Data Input1
-    rtsp-port: 8555
+    rtsp-port: 8554
+    sync: false
     video-in: On Request Data Input2
   type: nvidia::deepstream::NvDsRtspOut
 - name: On Request Data Input1
@@ -230,8 +236,8 @@ components:
 name: NvDsRtspOut
 ui_property:
   position:
-    x: 577.645751953125
-    y: 348.1423034667969
+    x: 631.6968383789062
+    y: 338.7420959472656
 ---
 components:
 - name: Deepstream Data Connection3
@@ -267,27 +273,6 @@ ui_property:
     y: -212.75137329101562
 ---
 components:
-- name: Fake Sink13
-  parameters:
-    in: Static Data Input14
-  type: nvidia::deepstream::NvDsFakeSink
-- name: Static Data Input14
-  type: nvidia::deepstream::NvDsStaticInput
-name: Fake Sink
-ui_property:
-  position:
-    x: 883.89501953125
-    y: -255.2847442626953
----
-components:
-- name: Deepstream Data Connection15
-  parameters:
-    source: Audio Inference/Static Data Output9
-    target: Fake Sink/Static Data Input14
-  type: nvidia::deepstream::NvDsConnection
-name: node3
----
-components:
 - name: Audio Classification Output16
   parameters:
     probe-connector: Probe Connector17
@@ -297,8 +282,8 @@ components:
 name: Audio Classification Output
 ui_property:
   position:
-    x: 944.5968627929688
-    y: -123.93318176269531
+    x: 881.08447265625
+    y: -101.96334838867188
 ---
 components:
 - name: Probe Monitor18
@@ -312,7 +297,7 @@ components:
 - name: Multi Source Input10
   parameters:
     audio-%u-out: Multiple Data Output12
-    file-loop: true
+    file-loop: false
     uri-list: file:///home/msc1/Desktop/Graphs/sample.mp4
     video-%u-out: Multiple Data Output11
   type: nvidia::deepstream::NvDsMultiSrcInput
@@ -424,3 +409,57 @@ components:
     target: Deepstream Queue/Static Data Input16
   type: nvidia::deepstream::NvDsConnection
 name: node6
+---
+components:
+- name: Fake Sink0
+  parameters:
+    in: Static Data Input1
+  type: nvidia::deepstream::NvDsFakeSink
+- name: Static Data Input1
+  type: nvidia::deepstream::NvDsStaticInput
+name: Fake Sink
+ui_property:
+  position:
+    x: 903.177001953125
+    y: -224.81643676757812
+---
+components:
+- name: Deepstream Data Connection5
+  parameters:
+    source: Audio Inference/Static Data Output9
+    target: Fake Sink/Static Data Input1
+  type: nvidia::deepstream::NvDsConnection
+name: node1
+---
+components:
+- name: Object Analytics22
+  parameters:
+    config-file: /home/msc1/Desktop/Graphs/roi-config.txt
+    video-in: Static Data Input24
+    video-out: Static Data Output23
+  type: nvidia::deepstream::NvDsAnalytics
+- name: Static Data Output23
+  type: nvidia::deepstream::NvDsStaticOutput
+- name: Static Data Input24
+  type: nvidia::deepstream::NvDsStaticInput
+name: Object Analytics
+ui_property:
+  position:
+    x: 617.2122802734375
+    y: 128.02691650390625
+---
+components:
+- name: Deepstream Data Connection25
+  parameters:
+    source: tracker/video_output
+    target: Object Analytics/Static Data Input24
+  type: nvidia::deepstream::NvDsConnection
+name: node2
+---
+components:
+- name: Deepstream Data Connection26
+  parameters:
+    source: Object Analytics/Static Data Output23
+    target: car_color_classifier/video_input
+  type: nvidia::deepstream::NvDsConnection
+name: node3
