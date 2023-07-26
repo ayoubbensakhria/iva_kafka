@@ -21,7 +21,7 @@ yolov4_config {
 }
 training_config {
   visualizer {
-      enabled: False
+      enabled: True
       num_images: 3
   }
   batch_size_per_gpu: 8
@@ -47,7 +47,7 @@ training_config {
       amsgrad: false
     }
   }
-  pruned_model_path: "EXPERIMENT_DIR/experiment_dir_pruned/yolov4_resnet18_pruned.tlt"
+  pruned_model_path: "/workspace/tao-experiments/yolo_v4/experiment_dir_pruned/yolov4_resnet18_pruned.tlt.hdf5"
   model_ema: true
 }
 eval_config {
@@ -77,33 +77,21 @@ augmentation_config {
 }
 dataset_config {
   data_sources: {
-      tfrecords_path: "/workspace/tao-experiments/data/training/tfrecords/train-fold*"
-      image_directory_path: "/workspace/tao-experiments/data/training"
+      tfrecords_path: "/workspace/tao-experiments/data/train/tfrecords-fold*"
+      image_directory_path: "/workspace/tao-experiments/data/train"
   }
   include_difficult_in_training: true
-  image_extension: "png"
+  image_extension: "jpg"
   target_class_mapping {
-      key: "car"
-      value: "car"
+      key: "knife"
+      value: "knife"
   }
   target_class_mapping {
-      key: "pedestrian"
-      value: "pedestrian"
-  }
-  target_class_mapping {
-      key: "cyclist"
-      value: "cyclist"
-  }
-  target_class_mapping {
-      key: "van"
-      value: "car"
-  }
-  target_class_mapping {
-      key: "person_sitting"
-      value: "pedestrian"
+      key: "gun"
+      value: "gun"
   }
   validation_data_sources: {
-      tfrecords_path: "/workspace/tao-experiments/data/val/tfrecords/val-fold*"
+      tfrecords_path: "/workspace/tao-experiments/data/val/tfrecords-fold*"
       image_directory_path: "/workspace/tao-experiments/data/val"
   }
 }
