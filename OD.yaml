@@ -297,7 +297,7 @@ components:
 - name: Multi Source Input10
   parameters:
     audio-%u-out: Multiple Data Output12
-    file-loop: false
+    file-loop: true
     uri-list: file:///home/msc1/Desktop/Graphs/sample.mp4
     video-%u-out: Multiple Data Output11
   type: nvidia::deepstream::NvDsMultiSrcInput
