@@ -71,8 +71,8 @@ components:
 name: tracker
 ui_property:
   position:
-    x: 623.6847534179688
-    y: -33.142799377441406
+    x: 617.3951416015625
+    y: -16.36859130859375
   state: 0
 ---
 components:
@@ -92,8 +92,8 @@ components:
 name: car_color_classifier
 ui_property:
   position:
-    x: 853.0664672851562
-    y: 30.793474197387695
+    x: 1071.4686279296875
+    y: 57.71419143676758
   state: 0
 ---
 components:
@@ -113,8 +113,8 @@ components:
 name: car_make_classifier
 ui_property:
   position:
-    x: 1080.1024169921875
-    y: 39.32283401489258
+    x: 1283.4906005859375
+    y: 81.25830078125
   state: 0
 ---
 components:
@@ -142,8 +142,8 @@ components:
 name: vehicle_type_classifier
 ui_property:
   position:
-    x: -20.50392723083496
-    y: 292.0394592285156
+    x: -41.471656799316406
+    y: 262.6846618652344
   state: 0
 ---
 components:
@@ -195,8 +195,8 @@ components:
 name: scheduler
 ui_property:
   position:
-    x: 891.49462890625
-    y: 357.1688232421875
+    x: 1112.2171630859375
+    y: 298.864501953125
   state: 0
 ---
 components:
@@ -236,16 +236,8 @@ components:
 name: NvDsRtspOut
 ui_property:
   position:
-    x: 631.6968383789062
-    y: 338.7420959472656
----
-components:
-- name: Deepstream Data Connection3
-  parameters:
-    source: onscreen_display/video_output
-    target: NvDsRtspOut/On Request Data Input2
-  type: nvidia::deepstream::NvDsConnection
-name: node0
+    x: 817.0206909179688
+    y: 305.42498779296875
 ---
 components:
 - name: Audio Inference8
@@ -297,7 +289,7 @@ components:
 - name: Multi Source Input10
   parameters:
     audio-%u-out: Multiple Data Output12
-    file-loop: true
+    file-loop: false
     uri-list: file:///home/msc1/Desktop/Graphs/sample.mp4
     video-%u-out: Multiple Data Output11
   type: nvidia::deepstream::NvDsMultiSrcInput
@@ -434,7 +426,7 @@ name: node1
 components:
 - name: Object Analytics22
   parameters:
-    config-file: /home/msc1/Desktop/Graphs/roi-config.txt
+    config-file: /home/msc1/Desktop/Graphs/config_nvdsanalytics.txt
     video-in: Static Data Input24
     video-out: Static Data Output23
   type: nvidia::deepstream::NvDsAnalytics
@@ -445,8 +437,8 @@ components:
 name: Object Analytics
 ui_property:
   position:
-    x: 617.2122802734375
-    y: 128.02691650390625
+    x: 610.9226684570312
+    y: 144.80111694335938
 ---
 components:
 - name: Deepstream Data Connection25
@@ -457,9 +449,88 @@ components:
 name: node2
 ---
 components:
-- name: Deepstream Data Connection26
+- name: 1-to-N pipe fitting8
   parameters:
-    source: Object Analytics/Static Data Output23
-    target: car_color_classifier/video_input
+    in: Static Data Input9
+    out-%u: On Request Data Output10
+  type: nvidia::deepstream::NvDsTee
+- name: Static Data Input9
+  type: nvidia::deepstream::NvDsStaticInput
+- name: On Request Data Output10
+  type: nvidia::deepstream::NvDsOnRequestOutput
+name: 1-to-N pipe fitting
+ui_property:
+  position:
+    x: 541.0114135742188
+    y: 356.2858581542969
+---
+components:
+- name: Deepstream Data Connection11
+  parameters:
+    source: onscreen_display/video_output
+    target: 1-to-N pipe fitting/Static Data Input9
+  type: nvidia::deepstream::NvDsConnection
+name: node2
+---
+components:
+- name: Deepstream Data Connection12
+  parameters:
+    source: 1-to-N pipe fitting/On Request Data Output10
+    target: NvDsRtspOut/On Request Data Input2
   type: nvidia::deepstream::NvDsConnection
 name: node3
+---
+components:
+- name: Video File Output13
+  parameters:
+    output-file: /home/msc1/Desktop/Graphs//sample3Output.mp4
+    video-in: Static Data Input14
+  type: nvidia::deepstream::NvDsFileOut
+- name: Static Data Input14
+  type: nvidia::deepstream::NvDsStaticInput
+name: Video File Output
+ui_property:
+  position:
+    x: 820.8563842773438
+    y: 468.729736328125
+---
+components:
+- name: Deepstream Data Connection15
+  parameters:
+    source: 1-to-N pipe fitting/On Request Data Output10
+    target: Video File Output/Static Data Input14
+  type: nvidia::deepstream::NvDsConnection
+name: node4
+---
+components:
+- name: Video Inference0
+  parameters:
+    config-file-path: /home/msc1/Desktop/export/yolov4/pgie_yolov4_tlt_config.txt
+    video-in: Static Data Input2
+    video-out: Static Data Output1
+  type: nvidia::deepstream::NvDsInferVideo
+- name: Static Data Output1
+  type: nvidia::deepstream::NvDsStaticOutput
+- name: Static Data Input2
+  type: nvidia::deepstream::NvDsStaticInput
+name: Video Inference
+ui_property:
+  position:
+    x: 848.8223876953125
+    y: 23.906042098999023
+---
+components:
+- name: Deepstream Data Connection3
+  parameters:
+    source: Object Analytics/Static Data Output23
+    target: Video Inference/Static Data Input2
+  type: nvidia::deepstream::NvDsConnection
+name: node0
+---
+components:
+- name: Deepstream Data Connection4
+  parameters:
+    source: Video Inference/Static Data Output1
+    target: car_color_classifier/video_input
+  type: nvidia::deepstream::NvDsConnection
+name: node1
